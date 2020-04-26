@@ -1,0 +1,58 @@
+<div nz-row class="login-row">
+  <div nz-col nzSpan="12" nzOffset="6"
+    style="background: #fff;padding: 50px; box-shadow: 0px 1px 2px #bbb; border-radius: 10px;"
+    *ngIf="!userContextService.user">
+    <form nz-form [formGroup]="loginForm" class="login-form" (ngSubmit)="submitForm()">
+      <nz-form-item>
+        <nz-form-control nzHasFeedback>
+          <nz-input-group>
+            <input type="text" nz-input formControlName="userName" placeholder="Please input username" />
+          </nz-input-group>
+          <nz-form-explain
+            *ngIf="(loginForm.get('userName')?.dirty && loginForm.get('userName')?.errors) || loginForm.get('userName')?.pending">
+            <ng-container *ngIf="loginForm.get('userName')?.hasError('required')">
+              please input username
+            </ng-container>
+            <ng-container *ngIf="loginForm.get('userName')?.hasError('lengthValid')">
+              Username format is incorrect
+            </ng-container>
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-control nzHasFeedback>
+          <nz-input-group>
+            <input type="password" nz-input formControlName="password" placeholder="Please input password" />
+          </nz-input-group>
+          <nz-form-explain
+            *ngIf="(loginForm.get('password')?.dirty && loginForm.get('password')?.errors) || loginForm.get('password')?.pending">
+            <ng-container *ngIf="loginForm.get('password')?.hasError('required')">
+              please input password!
+            </ng-container>
+            <ng-container *ngIf="loginForm.get('password')?.hasError('lengthValid')">
+              Password format is incorrect
+            </ng-container>
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-control>
+        <label for="admin">
+          <input type="radio" id="admin" formControlName="auth" value="admin">Teacher
+        </label>
+        <label for="user">
+          <input type="radio" id="user" formControlName="auth" value="user">Student
+        </label>
+
+      </nz-form-control>
+      <nz-form-item>
+        <nz-form-control>
+          <label nz-checkbox formControlName="remember">
+            <span>Remember me</span>
+          </label>
+          <button nz-button class="login-form-button" [nzType]="'primary'">Log in</button>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </div>
+  {{userContextService.user|json}}
+</div>
