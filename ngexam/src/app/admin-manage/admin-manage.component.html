@@ -1,0 +1,207 @@
+<h2>Techer Management</h2>
+<div>
+    <div class="table-operations">
+        <button nz-button (click)="showModal(0)">Add Teacher</button>
+    </div>
+    <nz-table #basicTable [nzData]="adminList" nzBordered [nzLoading]="tableLoading"
+        [nzPageIndex]="pageService.pageIndex" [nzPageSize]="pageService.pageSize">
+        <thead>
+            <tr>
+                <th>User Name</th>
+                <th>Description</th>
+                <th>Gender</th>
+                <th>Last Login</th>
+                <th>Login Count</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let data of basicTable.data">
+                <td>{{ data.username }}</td>
+                <td>{{ data.info }}</td>
+                <td>{{ data.sex | UserSexPipe}}</td>
+                <td>{{ data.lastTime | formatTime}}</td>
+                <td>{{ data.loginCount }}</td>
+            </tr>
+        </tbody>
+    </nz-table>
+</div>
+
+
+<h2>Student Management</h2>
+<div>
+    <div class="table-operations">
+        <button nz-button (click)="showStudentModal(1)">Add Students</button>
+    </div>
+    <nz-table #studentTable [nzData]="studentList" nzBordered [nzLoading]="tableLoading"
+        [nzPageIndex]="pageService.pageIndex" [nzPageSize]="pageService.pageSize">
+        <thead>
+            <tr>
+                <th>User Name</th>
+                <th>Description</th>
+                <th>Gender</th>
+                <th>Last Login</th>
+                <th>Login Count</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let data of studentTable.data">
+                <td>{{ data.username }}</td>
+                <td>{{ data.info }}</td>
+                <td>{{ data.sex | UserSexPipe}}</td>
+                <td>{{ data.lastTime | formatTime}}</td>
+                <td>{{ data.loginCount }}</td>
+            </tr>
+        </tbody>
+    </nz-table>
+</div>
+
+
+<!--teacher-->
+<!--add teacher modal-->
+<nz-modal [(nzVisible)]="isVisible" nzTitle="Add Teacher" [nzFooter]="null" (nzOnCancel)="handleCancel()"
+    (nzOnOk)="handleOk()">
+    <form nz-form [formGroup]="createForm" (ngSubmit)="submitForm()">
+        <nz-form-item>
+            <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="username">Username</nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24">
+                <input nz-input formControlName="username" id="username" placeholder="Please input username (5-20)" />
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+            <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="password" nzRequired>Password</nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24" nzErrorTip="Please input your password!">
+                <input nz-input type="password" id="password" formControlName="password"
+                    (ngModelChange)="updateConfirmValidator()" placeholder="Please input password (5-10)" />
+                <nz-form-explain
+                    *ngIf="(createForm.get('password')?.dirty && createForm.get('password')?.errors) || createForm.get('password')?.pending">
+                    <ng-container *ngIf="createForm.get('password')?.hasError('required')">
+                        Please input password!
+                    </ng-container>
+                    <ng-container *ngIf="createForm.get('password')?.hasError('lengthValid')">
+                        Password format is incorrect
+                    </ng-container>
+                </nz-form-explain>
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+            <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="checkPassword" nzRequired>Confirm Password</nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24" [nzErrorTip]="errorTpl">
+                <input nz-input type="password" formControlName="checkPassword" id="checkPassword" />
+                <ng-template #errorTpl let-control>
+                    <ng-container *ngIf="control.hasError('required')">
+                        Please confirm your password!
+                    </ng-container>
+                    <ng-container *ngIf="control.hasError('confirm')">
+                        Two passwords that you enter is inconsistent!
+                    </ng-container>
+                </ng-template>
+            </nz-form-control>
+        </nz-form-item>
+        <!-- <nz-form-item>
+            <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="auth">Auth</nz-form-label>
+            <nz-form-control [nzSm]="6" [nzXs]="24">
+                <input nz-input formControlName="auth" id="auth" />
+            </nz-form-control>
+        </nz-form-item> -->
+        <nz-form-item>
+            <nz-form-label [nzSm]="6" [nzXs]="6">Gender</nz-form-label>
+            <nz-form-label [nzSm]="2" [nzXs]="6" nzFor="auth">Male</nz-form-label>
+            <nz-form-control [nzSm]="2" [nzXs]="2">
+                <input type="radio" formControlName="sex" id="b" #boy value="1" />
+            </nz-form-control>
+            <nz-form-label [nzSm]="2" [nzXs]="2" nzFor="auth">Female</nz-form-label>
+            <nz-form-control [nzSm]="2" [nzXs]="2">
+                <input type="radio" formControlName="sex" id="g" #girl value="0" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="username">Description</nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24">
+                <textarea formControlName="info" nz-input rows="4" placeholder="no more than 300"></textarea>
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item nz-row class="register-area">
+            <nz-form-control [nzSpan]="14" [nzOffset]="6">
+                <button nz-button nzType="primary" [disabled]="!createForm.valid"
+                    [nzLoading]="isOkLoading">Confirm</button>
+            </nz-form-control>
+        </nz-form-item>
+    </form>
+</nz-modal>
+
+<!--student-->
+<!--add student modal-->
+<nz-modal [(nzVisible)]="isStudentVisible" nzTitle="Add Students" [nzFooter]="null" (nzOnCancel)="handleStudentCancel()"
+    (nzOnOk)="handleStudentOk()">
+    <form nz-form [formGroup]="studentForm" (ngSubmit)="studentSubmitForm()">
+        <nz-form-item>
+            <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="username">Username</nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24">
+                <input nz-input formControlName="username" id="username" placeholder="Please input username (5-20)" />
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+            <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="password" nzRequired>Password</nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24" nzErrorTip="Please input your password!">
+                <input nz-input type="password" id="password" formControlName="password"
+                    (ngModelChange)="updateStudentConfirmValidator()" placeholder="Please input password (5-10)" />
+                <nz-form-explain
+                    *ngIf="(studentForm.get('password')?.dirty && studentForm.get('password')?.errors) || studentForm.get('password')?.pending">
+                    <ng-container *ngIf="studentForm.get('password')?.hasError('required')">
+                        Please input password!
+                    </ng-container>
+                    <ng-container *ngIf="studentForm.get('password')?.hasError('lengthValid')">
+                        Password format is incorrect
+                    </ng-container>
+                </nz-form-explain>
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+            <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="checkPassword" nzRequired>Confirm Password</nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24" [nzErrorTip]="errorTpl">
+                <input nz-input type="password" formControlName="checkPassword" id="checkPassword" />
+                <ng-template #errorTpl let-control>
+                    <ng-container *ngIf="control.hasError('required')">
+                        Please confirm your password!
+                    </ng-container>
+                    <ng-container *ngIf="control.hasError('confirm')">
+                        Two passwords that you enter is inconsistent!
+                    </ng-container>
+                </ng-template>
+            </nz-form-control>
+        </nz-form-item>
+        <!-- <nz-form-item>
+            <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="auth">Auth</nz-form-label>
+            <nz-form-control [nzSm]="6" [nzXs]="24">
+                <input nz-input formControlName="auth" id="auth" />
+            </nz-form-control>
+        </nz-form-item> -->
+        <nz-form-item>
+            <nz-form-label [nzSm]="6" [nzXs]="6">Gender</nz-form-label>
+            <nz-form-label [nzSm]="2" [nzXs]="6" nzFor="auth">Male</nz-form-label>
+            <nz-form-control [nzSm]="2" [nzXs]="2">
+                <input type="radio" formControlName="sex" id="b" #boy value="1" />
+            </nz-form-control>
+            <nz-form-label [nzSm]="2" [nzXs]="2" nzFor="auth">Female</nz-form-label>
+            <nz-form-control [nzSm]="2" [nzXs]="2">
+                <input type="radio" formControlName="sex" id="g" #girl value="0" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="username">Description</nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24">
+                <textarea formControlName="info" nz-input rows="4" placeholder="no more than 300"></textarea>
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item nz-row class="register-area">
+            <nz-form-control [nzSpan]="14" [nzOffset]="6">
+                <button nz-button nzType="primary" [disabled]="!studentForm.valid"
+                    [nzLoading]="isOkLoading">Confirm</button>
+            </nz-form-control>
+        </nz-form-item>
+    </form>
+</nz-modal>

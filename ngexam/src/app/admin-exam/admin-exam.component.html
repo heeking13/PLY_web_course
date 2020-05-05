@@ -1,0 +1,41 @@
+<div class="table-operations">
+    <button nz-button (click)="approved(1)">PASS REVIEW</button>
+    <button nz-button (click)="approved(0)">NOT PASS</button>
+</div>
+<nz-table #rowSelectionTable nzShowSizeChanger [nzData]="examList"
+    (nzCurrentPageDataChange)="currentPageDataChange($event)" [nzLoading]="tableLoading"
+    [(nzPageIndex)]="pageService.pageIndex" [(nzPageSize)]="pageService.pageSize" [nzTotal]="pageService.total"
+    (nzPageIndexChange)="getExamList()" (nzPageSizeChange)="getExamList(true)" [nzFrontPagination]="false">
+    <thead>
+        <tr>
+            <th nzShowCheckbox [(nzChecked)]="isAllDisplayDataChecked" [nzIndeterminate]="isIndeterminate"
+                (nzCheckedChange)="checkAll($event)"></th>
+            <th>Exam Name</th>
+            <th>Exam Description</th>
+            <th>Review Status</th>
+            <th>Date</th>
+            <th>Operation</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let data of rowSelectionTable.data">
+            <td nzShowCheckbox [(nzChecked)]="mapOfCheckedId[data._id]" (nzCheckedChange)="refreshStatus()"></td>
+            <td>{{ data.examName }}</td>
+            <td><a (click)="showExamInfo(data.examInfo)">{{ data.examInfo | formatLength:5}}</a></td>
+            <td>
+                <ng-container *ngIf="data.state==1">
+                    <nz-badge [nzStatus]="'success'" [nzText]="'PASS'"></nz-badge>
+                </ng-container>
+                <ng-container *ngIf="data.state==0">
+                    <nz-badge [nzStatus]="'error'" [nzText]="'NOT PASS'"></nz-badge>
+                </ng-container>
+            </td>
+            <td>{{data.date | formatTime }}</td>
+            <td>
+                <a (click)="goQuestion(data._id)">Add Exam Sheet</a>
+                <nz-divider nzType="vertical"></nz-divider>
+                <a nz-popconfirm nzPopconfirmTitle="Sure to delete?" (nzOnConfirm)="deleteExam(data._id)">Delete</a>
+            </td>
+        </tr>
+    </tbody>
+</nz-table>

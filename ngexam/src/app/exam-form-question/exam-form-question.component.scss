@@ -1,0 +1,19 @@
+ul{
+    margin:0;
+    padding:0;
+}
+
+label.question-radio,label.question-checkbox{
+    cursor:pointer;
+    padding:10px;
+}
+
+label.question-radio>input,label.question-checkbox>input{
+    margin-top:10px;
+    margin-left:10px;
+}
+.li-radio{
+    list-style: none;
+    margin:10px 0;
+    display: inline-block;
+}

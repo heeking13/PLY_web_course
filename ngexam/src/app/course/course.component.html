@@ -1,0 +1,152 @@
+<div class="table-operations">
+    <button nz-button (click)="showModal()">New Course</button>
+    <button nz-button (click)="showExamModal()">New Exam</button>
+    <button nz-button (click)="allocateShowModal()">Distribute Exam</button>
+</div>
+
+<nz-table #nestedTable [nzData]="courseList" nzBordered [nzFrontPagination]="false" [nzLoading]="tableLoading"
+    [(nzPageIndex)]="pageService.pageIndex" [(nzPageSize)]="pageService.pageSize" [nzTotal]="pageService.total"
+    (nzPageIndexChange)="getcourseList()" (nzPageSizeChange)="getcourseList(true)">
+    <thead>
+        <tr>
+            <th nzShowExpand></th>
+            <th>Course Name</th>
+            <th>Description</th>
+            <th>Date</th>
+            <th>Operation</th>
+        </tr>
+    </thead>
+    <tbody>
+        <ng-template ngFor let-data [ngForOf]="nestedTable.data">
+            <tr>
+                <td nzShowExpand [(nzExpand)]="data.expand"></td>
+                <td>{{ data.courseName}}</td>
+                <td><a (click)="showCourseInfo(data.courseInfo)">{{ data.courseInfo | formatLength:5 }}</a></td>
+                <td>{{ data.date | formatTime}}</td>
+                <td>
+                    <a (click)="showModal(data)">Edit</a>
+                    <nz-divider nzType="vertical"></nz-divider>
+                    <a nz-popconfirm nzPopconfirmTitle="Sure to delete?"
+                        (nzOnConfirm)="deleteCourse(data._id)">Delete</a>
+                </td>
+            </tr>
+            <tr [nzExpand]="data.expand">
+                <td></td>
+                <td colspan="7">
+                    <nz-table #innerTable [nzData]="data.populateExam" nzSize="middle" [nzShowPagination]="false">
+                        <thead>
+                            <tr>
+                                <th>Exam Name</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+    <tbody>
+        <tr *ngFor="let innerData of innerTable.data">
+            <td>{{ innerData.examName }}</td>
+            <td>{{ innerData.examInfo }}</td>
+            <td>
+                <ng-container *ngIf="innerData.state==1">
+                    <nz-badge [nzStatus]="'success'" [nzText]="'PASS'"></nz-badge>
+                </ng-container>
+                <ng-container *ngIf="innerData.state==0">
+                    <nz-badge [nzStatus]="'error'" [nzText]="'NOT PASS'"></nz-badge>
+                </ng-container>
+
+            </td>
+            <td>{{ innerData.date | formatTime}}</td>
+            <td>
+                <span class="table-operation">
+                    <a nz-popconfirm nzPopconfirmTitle="Sure to delete?"
+                        (nzOnConfirm)="deleteAllocate(data._id,innerData._id)">Delete
+                    </a>
+                </span>
+            </td>
+        </tr>
+    </tbody>
+</nz-table>
+</tr>
+</ng-template>
+</tbody>
+</nz-table>
+
+<!--add course-->
+<nz-modal [(nzVisible)]="isVisible" [nzTitle]="courseModalTitle" [nzFooter]="null" (nzOnCancel)="handleCancel()"
+    [nzOkLoading]="isOkLoading">
+    <form nz-form [formGroup]="createForm" (ngSubmit)="submitForm()">
+        <nz-form-item>
+            <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="courseName">Course Name</nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24">
+                <input nz-input formControlName="courseName" id="courseName" placeholder="Please input course name" />
+            </nz-form-control>
+
+        </nz-form-item>
+        <nz-form-item>
+            <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="courseInfo">Description</nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24">
+                <textarea formControlName="courseInfo" nz-input rows="4" placeholder="Optional"></textarea>
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+            <nz-form-control [nzSm]="14" [nzXs]="24" [nzOffset]="6">
+                <button nz-button nzType="primary" nzBlock="true" [nzLoading]="isOkLoading"
+                    [disabled]="!createForm.valid">Confirm</button>
+            </nz-form-control>
+        </nz-form-item>
+    </form>
+</nz-modal>
+
+<!--add exam-->
+<nz-modal [(nzVisible)]="isExamVisible" nzTitle="Add new exam" [nzFooter]="null" (nzOnCancel)="handleExamCancel()"
+    [nzOkLoading]="isExamOkLoading">
+    <form nz-form [formGroup]="createExamForm" (ngSubmit)="submitExamForm()">
+        <nz-form-item>
+            <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="examName">Exam Name</nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24">
+                <input nz-input formControlName="examName" id="examName" placeholder="Please input exam name" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label [nzSm]="6" [nzXs]="6">Review Status</nz-form-label>
+            <nz-form-label [nzSm]="4" [nzXs]="4" nzFor="b">Pass Review</nz-form-label>
+            <nz-form-control [nzSm]="2" [nzXs]="2">
+                <input type="radio" formControlName="state" id="b" #pass value="1" />
+            </nz-form-control>
+            <nz-form-label [nzSm]="4" [nzXs]="4" nzFor="g">No Review</nz-form-label>
+            <nz-form-control [nzSm]="2" [nzXs]="2">
+                <input type="radio" formControlName="state" id="g" #fail value="0" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="examInfo">Description</nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24">
+                <textarea formControlName="examInfo" nz-input rows="4" placeholder="Optional"></textarea>
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+            <nz-form-control [nzSm]="14" [nzXs]="24" [nzOffset]="6">
+                <button nz-button nzType="primary" nzBlock="true" [nzLoading]="isExamOkLoading"
+                    [disabled]="!createExamForm.valid">Confirm</button>
+            </nz-form-control>
+        </nz-form-item>
+    </form>
+</nz-modal>
+
+<!--distribute exam-->
+
+<nz-modal [(nzVisible)]="allocateModalisVisible" nzTitle="Distribute exam" (nzOnOk)="allocateHandleOk()"
+    (nzOnCancel)="allocateCancel()" [nzOkLoading]="allocateModalisOkLoading">
+    <nz-select [(ngModel)]="selectCourseValue" nzAllowClear nzPlaceHolder="Choose">
+        <nz-option [nzValue]="course._id" [nzLabel]="course.courseName" *ngFor="let course of selectCourseList">
+        </nz-option>
+    </nz-select>
+    <nz-select [nzMaxTagCount]="3" [nzMaxTagPlaceholder]="tagPlaceHolder" nzMode="multiple"
+        nzPlaceHolder="Please select" [(ngModel)]="listOfSelectedValue" style="width: 50%; margin-left: 20px;">
+        <nz-option *ngFor="let option of listOfOption" [nzLabel]="option.examName" [nzValue]="option._id"></nz-option>
+    </nz-select>
+    <ng-template #tagPlaceHolder let-selectedList> and {{ selectedList.length }} more selected </ng-template>
+</nz-modal>

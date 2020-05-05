@@ -1,0 +1,19 @@
+<nz-table #basicTable [nzData]="scoreList" [(nzPageIndex)]="pageService.pageIndex" [(nzPageSize)]="pageService.pageSize"
+    [nzLoading]="tableLoadingtrue">
+    <thead>
+        <tr>
+            <th>Exam Name</th>
+            <th>User Name</th>
+            <th>Mark</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let data of basicTable.data">
+            <td>{{ data.examName }}</td>
+            <td>{{ data.userName}}</td>
+            <td>{{ data.score}}</td>
+            <td>{{ data.date | formatTime}}</td>
+        </tr>
+    </tbody>
+</nz-table>

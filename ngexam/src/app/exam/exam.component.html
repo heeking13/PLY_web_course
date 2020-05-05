@@ -1,0 +1,15 @@
+<div class="main">
+    <div nz-row>
+        <div nz-col nzSpan="6">
+            <nz-cascader [nzOptions]="nzOptions" [(ngModel)]="values" nzPlaceHolder="Please select"
+                (ngModelChange)="onChanges($event)"></nz-cascader>
+        </div>
+        <div nz-col nzSpan="16">
+            <h1 class="examTitle">{{examTitle}}</h1>
+            <app-exam-form [questionList]="questionList" [examName]="examTitle"></app-exam-form>
+        </div>
+        <div nz-col nzSpan="2">
+
+        </div>
+    </div>
+</div>

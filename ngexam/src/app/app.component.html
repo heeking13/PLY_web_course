@@ -1,0 +1,28 @@
+<nz-layout>
+  <nz-header>
+    <ul nz-menu [nzTheme]="'dark'" [nzMode]="'horizontal'" class="header-menu">
+      <img class="photo" src="assets/img/logo.jpg" style="margin-right:60px">
+      <li nz-menu-item routerLink="/adminCourse">Course Management</li>
+      <li nz-menu-item routerLink="/adminExam">Exam Management</li>
+      <li nz-menu-item routerLink="/adminScore">Mark Management</li>
+      <li nz-menu-item routerLink="/adminManage">User Management</li>
+      <li nz-menu-item routerLink="/exam">Exam Now</li>
+      <li nz-menu-item routerLink="/login">
+        <ng-container *ngIf="userContextService.user">{{userContextService.user.username}}</ng-container>
+        <ng-container *ngIf="!userContextService.user">Login</ng-container>
+      </li>
+      <li nz-menu-item (click)="logout()" routerLink="/login" *ngIf="userContextService.user">Log Out</li>
+    </ul>
+  </nz-header>
+  <nz-content class="outer-content">
+    <nz-layout class="inner-layout">
+
+      <nz-content class="inner-content">
+        <router-outlet>
+
+        </router-outlet>
+      </nz-content>
+    </nz-layout>
+    <nz-footer>Online Exam Website 2020 Implement By Angular</nz-footer>
+  </nz-content>
+</nz-layout>

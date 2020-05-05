@@ -1,0 +1,23 @@
+<div [formGroup]="form" style="margin-top:20px;">
+    <label>{{question.questionName}}</label>
+    <div [ngSwitch]="question.controlType">
+        <div *ngSwitchCase="0">
+            <ul>
+                <li *ngFor="let radio of question.questions" class="li-radio">
+                    <label class="question-radio">
+                        <input nzRequired type="radio" [formControlName]="question.id" [value]="radio.value">
+                        {{radio.key}}
+                    </label>
+                </li>
+            </ul>
+        </div>
+        <div *ngSwitchCase="1">
+            <input type="text" [formControlName]="question.id" [hidden]="true" />
+            <label *ngFor="let checbox of question.questions" class="radio-inline question-checkbox">
+                {{checbox.key}} <input type="checkbox" #oneCheckBox [value]="checbox.value"
+                    (click)="setCheckBoxValue(oneCheckBox,question.id)" />
+            </label>
+        </div>
+
+    </div>
+</div>

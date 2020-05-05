@@ -1,0 +1,8 @@
+<form [formGroup]="form" *ngIf="form" (ngSubmit)="onSubmit()">
+    <div *ngFor="let question of questionList">
+        <app-exam-form-question [question]="question" [form]="form"></app-exam-form-question>
+    </div>
+    <div>
+        <button tyep="submit" nz-button nzType="primary" style="margin-top: 20px;">Submit</button>
+    </div>
+</form>

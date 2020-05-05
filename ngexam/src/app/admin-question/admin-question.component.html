@@ -1,0 +1,121 @@
+<nz-breadcrumb class="bread">
+    <nz-breadcrumb-item>
+        <a routerLink="/adminExam">Exam Management</a>
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item *ngIf="exam$|async as exam">
+        {{exam.examName}}
+    </nz-breadcrumb-item>
+</nz-breadcrumb>
+<div class="table-operations">
+    <button nz-button (click)="showModal()">New Exam Sheet</button>
+</div>
+<nz-table #basicTable [nzData]="questionList" nzBordered [nzLoading]="tableLoading"
+    [(nzPageIndex)]="pageService.pageIndex" [(nzPageSize)]="pageService.pageSize">
+    <thead>
+        <tr>
+            <th>Content</th>
+            <th>Description</th>
+            <th>Option A</th>
+            <th>Option B</th>
+            <th>Option C</th>
+            <th>Option D</th>
+            <th>Answer</th>
+            <th nzShowFilter [nzFilters]="listOftype" (nzFilterChange)="filyerType($event)">Type</th>
+            <th>Date</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let data of basicTable.data">
+            <td>{{ data.questionName }}</td>
+            <td><a (click)="showInfo(data.questionInfo)">{{ data.questionInfo | formatLength:5}}</a></td>
+            <td>{{ data.question0 }}</td>
+            <td>{{ data.question1 }}</td>
+            <td>{{ data.question2 }}</td>
+            <td>{{ data.question3 }}</td>
+            <td>{{ data.answer | answerPipe}}</td>
+            <td>{{ data.type | questionType}}</td>
+            <td>{{ data.date | formatTime}}</td>
+        </tr>
+    </tbody>
+</nz-table>
+
+<nz-modal [(nzVisible)]="isVisible" nzTitle="Add Exam Sheet" [nzFooter]="null" (nzOnCancel)="handleCancel()"
+    [nzOkLoading]="isOkLoading">
+    <form nz-form [formGroup]="validateForm" (ngSubmit)="submitForm()">
+        <nz-form-item>
+            <nz-form-label [nzSm]="4" [nzXs]="24" nzFor="questionName">Content</nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24">
+                <input nz-input formControlName="questionName" id="questionName" placeholder="no more than 100" />
+                <nz-form-explain
+                    *ngIf="(validateForm.get('questionName')?.dirty && validateForm.get('questionName')?.errors) || validateForm.get('questionName')?.pending">
+                    <ng-container *ngIf="validateForm.get('questionName')?.hasError('required')">
+                        please input question Name!
+                    </ng-container>
+                    <ng-container *ngIf="validateForm.get('password')?.hasError('lengthValid')">
+                        Question name format is incorrect
+                    </ng-container>
+                </nz-form-explain>
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label [nzSm]="4" [nzXs]="24" nzRequired="true" nzFor="questionInfo">Type</nz-form-label>
+            <nz-select style="width: 120px;" formControlName="type" nzAllowClear nzPlaceHolder="Please select">
+                <nz-option nzValue="0" nzLabel="Sigle"></nz-option>
+                <nz-option nzValue="1" nzLabel="Multiple"></nz-option>
+            </nz-select>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label [nzSm]="4" [nzXs]="24" nzFor="questionInfo">Description</nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24">
+                <textarea formControlName="questionInfo" nz-input rows="4" placeholder="no more than 300"></textarea>
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item *ngFor="let control of listOfControl; let i = index">
+            <nz-form-label [nzXs]="24" [nzSm]="4" *ngIf="i == 0" [nzFor]="control.controlInstance">Choose
+            </nz-form-label>
+            <nz-form-control [nzXs]="24" [nzSm]="20" [nzOffset]="i == 0 ? 0 : 4"
+                nzErrorTip="Please input passenger's name or delete this field.">
+                {{answerArr[i].label}}<input class="passenger-input" nz-input
+                    [placeholder]="'option-'+answerArr[i].label" [attr.id]="control.id"
+                    [formControlName]="control.controlInstance"
+                    style="width: 60%;margin-right: 8px; margin-left: 10px;" />
+                <i nz-icon nzType="minus-circle-o" class="dynamic-delete-button"
+                    (click)="removeField(control, $event, answerArr[i])"></i>
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-control [nzXs]="{ span: 24, offset: 0 }" [nzSm]="{ span: 20, offset: 4 }">
+                <button nz-button nzType="dashed" class="add-button" (click)="addField($event)"
+                    [disabled]="answerArr.length===4">
+                    <i nz-icon nzType="plus"></i>
+                    Add Choose
+                </button>
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label [nzXs]="24" [nzSm]="4">Answer
+            </nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24">
+                <nz-select [nzMaxTagCount]="4" [nzMaxTagPlaceholder]="tagPlaceHolder" nzMode="multiple"
+                    formControlName="answer" nzPlaceHolder="Please select" [nzAllowClear]="true">
+                    <nz-option *ngFor="let option of answerArr" [nzLabel]="option.label" [nzValue]="option.value">
+                    </nz-option>
+                </nz-select>
+                <ng-template #tagPlaceHolder let-selectedList> and {{ validateForm.value.answer.length }} more selected
+                </ng-template>
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-control [nzXs]="{ span: 14, offset: 0 }" [nzSm]="{ span: 10, offset: 4 }">
+                <button nz-button nzType="primary" nzBlock="true" [disabled]="!validateForm.valid">Submit</button>
+            </nz-form-control>
+        </nz-form-item>
+    </form>
+</nz-modal>

@@ -1,0 +1,69 @@
+<form nz-form [formGroup]="memberForm" (ngSubmit)="submitForm()">
+    <nz-page-header nzTitle="Edit personal information" style="text-align: center;"></nz-page-header>
+    <nz-form-item>
+        <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="username">Username</nz-form-label>
+        <nz-form-control [nzSm]="14" [nzXs]="24">
+            <input nz-input formControlName="username" id="username" />
+        </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+        <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="password" nzRequired>Password</nz-form-label>
+        <nz-form-control [nzSm]="14" [nzXs]="24" nzErrorTip="Please input your password!">
+            <input nz-input type="password" id="password" formControlName="password"
+                (ngModelChange)="updateConfirmValidator()" />
+            <nz-form-explain
+                *ngIf="(memberForm.get('password')?.dirty && memberForm.get('password')?.errors) || memberForm.get('password')?.pending">
+                <ng-container *ngIf="memberForm.get('password')?.hasError('required')">
+                    Please input password!
+                </ng-container>
+                <ng-container *ngIf="memberForm.get('password')?.hasError('lengthValid')">
+                    Password format is incorrect
+                </ng-container>
+            </nz-form-explain>
+        </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+        <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="checkPassword" nzRequired>Confirm Password</nz-form-label>
+        <nz-form-control [nzSm]="14" [nzXs]="24" [nzErrorTip]="errorTpl">
+            <input nz-input type="password" formControlName="checkPassword" id="checkPassword" />
+            <ng-template #errorTpl let-control>
+                <ng-container *ngIf="control.hasError('required')">
+                    Please confirm your password!
+                </ng-container>
+                <ng-container *ngIf="control.hasError('confirm')">
+                    Two passwords that you enter is inconsistent!
+                </ng-container>
+            </ng-template>
+        </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+        <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="auth">Auth</nz-form-label>
+        <nz-form-control [nzSm]="6" [nzXs]="24">
+            <input nz-input formControlName="auth" id="auth" />
+        </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+        <nz-form-label [nzSm]="6" [nzXs]="6">Gender</nz-form-label>
+        <nz-form-label [nzSm]="2" [nzXs]="6" nzFor="auth">Male</nz-form-label>
+        <nz-form-control [nzSm]="2" [nzXs]="2">
+            <input type="radio" formControlName="sex" id="b" #boy value="1" />
+        </nz-form-control>
+        <nz-form-label [nzSm]="2" [nzXs]="2" nzFor="auth">Female</nz-form-label>
+        <nz-form-control [nzSm]="2" [nzXs]="2">
+            <input type="radio" formControlName="sex" id="g" #girl value="0" />
+        </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="username">Description</nz-form-label>
+        <nz-form-control [nzSm]="14" [nzXs]="24">
+            <textarea formControlName="info" nz-input rows="4" placeholder="no more than 300"></textarea>
+        </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item nz-row class="register-area">
+        <nz-form-control [nzSpan]="14" [nzOffset]="6">
+            <button nz-button nzType="primary" [disabled]="!memberForm.valid">Confirm</button>
+        </nz-form-control>
+    </nz-form-item>
+</form>
